@@ -116,6 +116,10 @@ base class SimpleModel {
       return double.tryParse(value.toString()) as T?;
     }
 
+    if (T == num) {
+      return num.tryParse(value.toString()) as T?;
+    }
+
     if (T == bool) {
       return bool.tryParse(value.toString()) as T?;
     }
