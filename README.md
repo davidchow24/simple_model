@@ -81,7 +81,7 @@ If you want to convert JSON data like this
 {
   ...
   "company": {
-    "name": "Google",
+    "name": "Company Name",
     "location": "Mountain View"
   },
   "friends": [
