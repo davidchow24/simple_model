@@ -34,8 +34,8 @@ The following example shows how to convert
 ```dart
 import 'package:simple_model/simple_model.dart';
 
-final class ExampleSimpleModel extends SimpleModel {
-  ExampleSimpleModel.fromJson(super.data);
+final class ExampleModel extends SimpleModel {
+  ExampleModel.fromJson(super.data);
 
   String? get name => $get('name');
 
@@ -52,7 +52,7 @@ final class ExampleSimpleModel extends SimpleModel {
 Example for `fromJson` and `toJson` methods
 
 ```dart
-final model = ExampleSimpleModel.fromJson({
+final model = ExampleModel.fromJson({
   "name": "John Doe",
   "age": 30,
   "height": 1.8,
@@ -94,30 +94,30 @@ If you want to convert JSON data like this
 The following example shows how to convert
 
 ```dart
-final class ExampleSimpleModel extends SimpleModel {
+final class ExampleModel extends SimpleModel {
   ...
 
-  ExampleCompanySimpleModel? get company => $get(
+  ExampleCompanyModel? get company => $get(
         'company',
-        fromJson: ExampleCompanySimpleModel.fromJson,
+        fromJson: ExampleCompanyModel.fromJson,
       );
 
-  List<ExampleFriendSimpleModel?>? get friends => $get(
+  List<ExampleFriendModel?>? get friends => $get(
         'friends',
-        fromList: $fromList(ExampleFriendSimpleModel.fromJson),
+        fromList: $fromList(ExampleFriendModel.fromJson),
       );
 }
 
-final class ExampleCompanySimpleModel extends SimpleModel {
-  ExampleCompanySimpleModel.fromJson(super.data);
+final class ExampleCompanyModel extends SimpleModel {
+  ExampleCompanyModel.fromJson(super.data);
 
   String? get name => $get('name');
 
   String? get location => $get('location');
 }
 
-final class ExampleFriendSimpleModel extends SimpleModel {
-  ExampleFriendSimpleModel.fromJson(super.data);
+final class ExampleFriendModel extends SimpleModel {
+  ExampleFriendModel.fromJson(super.data);
 
   String? get name => $get('name');
 
@@ -149,7 +149,7 @@ If you want to convert the JSON like this
 The following example shows how to convert
 
 ```dart
-final model = SimpleModel.fromJsonList(ExampleSimpleModel.fromJson)([
+final model = SimpleModel.fromJsonList(ExampleModel.fromJson)([
   {
     "name": "John Doe",
     "age": 30,
@@ -174,18 +174,18 @@ model.length; // 2
 You can add `copyWith` like this
 
 ```dart
-ExampleSimpleModel copyWith({
+ExampleModel copyWith({
   String? name,
   int? age,
   double? height,
   List<int?>? scores,
   bool? isEmployed,
-  ExampleCompanySimpleModel? company,
-  List<ExampleFriendSimpleModel?>? friends,
+  ExampleCompanyModel? company,
+  List<ExampleFriendModel?>? friends,
 }) =>
     $copyWith(
       toJson(),
-      fromJson: ExampleSimpleModel.fromJson,
+      fromJson: ExampleModel.fromJson,
       value: {
         'name': name,
         'age': age,
