@@ -1,3 +1,7 @@
+## 1.0.7
+
+Fix SimpleModel.fromJsonList
+
 ## 1.0.6
 
 Update documentation
