@@ -209,6 +209,7 @@ ExampleModel copyWith({
   double? height,
   List<int?>? scores,
   bool? isEmployed,
+  Status? status,
   ExampleCompanyModel? company,
   List<ExampleFriendModel?>? friends,
 }) =>
@@ -221,6 +222,7 @@ ExampleModel copyWith({
         'height': height,
         'scores': scores,
         'isEmployed': isEmployed,
+        'status': Status.enumMap[status],
         'company': company?.toJson(),
         'friends': friends?.toJson(),
       },
