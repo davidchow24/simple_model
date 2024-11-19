@@ -1,3 +1,7 @@
+## 1.0.5
+
+Support enum
+
 ## 1.0.4
 
 Support num

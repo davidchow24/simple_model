@@ -1,41 +1,47 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
-extension ListSimpleModelExtension on List<SimpleModel?> {
-  /// Converts the list of [SimpleModel] objects to a list of maps.
-  /// Each map represents the JSON representation of a [SimpleModel] object.
-  /// If a [SimpleModel] object is null, it will be represented as null in the resulting list.
-  List<Map<String, Object?>?> toJson() => map((e) => e?.toJson()).toList();
-}
-
+/// A base class for the SimpleModel.
+///
+/// This class serves as a foundation for creating simple models.
+/// Extend this class to implement specific model functionalities.
 base class SimpleModel {
   @protected
   SimpleModel(Map<String, Object?>? data)
       : _data = data != null ? Map.unmodifiable(data) : null;
 
-  /// Converts a list of JSON objects to a list of objects.
-  static List<T?>? Function(List<Object?>? json) fromJsonList<T>(
-    T? Function(Map<String, Object?>?)? fromJsonT,
+  /// Generates a map from enum values to mapped values using the provided mapper function.
+  ///
+  /// This function takes a list of enum values and a mapper function, and returns a map
+  /// where each enum value is a key and the corresponding mapped value is the value.
+  ///
+  /// - Parameters:
+  ///   - mapper: A function that takes an enum value and returns a mapped value.
+  ///   - values: A list of enum values to be used as keys in the map.
+  ///
+  /// - Returns: A map where each key is an enum value and each value is the result of
+  ///   applying the mapper function to the corresponding enum value.
+  static Map<E, T> Function(T Function(E) mapper) getEnumMap<T, E extends Enum>(
+    List<E> values,
   ) {
-    return (List<Object?>? data) {
-      if (data is List<T?>?) {
-        return data;
-      }
-      if (fromJsonT != null) {
-        return data.whereType<Map<String, Object?>?>().map(fromJsonT).toList();
-      }
-      return null;
-    };
+    return (T Function(E) mapper) => Map.unmodifiable({
+          for (final value in values) value: mapper(value),
+        });
   }
 
-  /// A protected method that creates a new instance of [T] by merging the provided [data] with the current instance's data.
+  /// A protected method that creates a copy of an object with updated values.
   ///
-  /// This method is used to create a new instance of [T] with updated values. It takes 3 parameters:
-  /// - [data] : A required map of data that will be merged with the current instance's data.
-  /// - [fromJson] : A required function that converts a map of data to an instance of [T].
-  /// - [value] : A required map of data that will be merged with the current instance's data.
+  /// This method takes a map of data and a map of values, and returns a new object
+  /// created by merging the data and values maps. The `fromJson` function is used
+  /// to create the new object from the merged map.
   ///
-  /// The method returns a new instance of [T] with the updated values.
+  /// - Parameters:
+  ///   - data: A map of data to be copied. Can be null.
+  ///   - fromJson: A function that creates an object of type `T` from a map.
+  ///   - value: A map of values to update in the copied data. Only non-null values
+  ///     will be included in the merged map.
+  ///
+  /// - Returns: A new object of type `T` created from the merged map.
   @protected
   T $copyWith<T>(
     Map<String, Object?>? data, {
@@ -49,12 +55,16 @@ base class SimpleModel {
     });
   }
 
-  /// A protected method that returns a function that can convert a list of JSON objects to a list of objects.
+  /// Converts a list of objects to a list of a specific type [T].
   ///
-  /// This method is used to handle the conversion of a list of JSON objects to a list of [T] objects.
-  /// It takes a single optional parameter [fromJsonT], which is a function that converts a single JSON object to a [T] object.
+  /// The [fromJsonT] parameter is a function that converts a map to an instance of [T].
+  /// If [data] is already a list of [T], it is returned as is.
+  /// If [fromJsonT] is provided, it is used to convert each map in [data] to an instance of [T].
   ///
-  /// This method is intended to be used as a helper method within the [SimpleModel] class and its subclasses.
+  /// Returns a list of [T] or null if [data] is null or cannot be converted.
+  ///
+  /// - [data]: The list of objects to be converted.
+  /// - [fromJsonT]: A function that converts a map to an instance of [T].
   @protected
   List<T?>? Function(List<Object?>? data) $fromList<T>(
     T? Function(Map<String, Object?>?)? fromJsonT,
@@ -70,30 +80,60 @@ base class SimpleModel {
     };
   }
 
+  /// A protected function that returns a function to map a value to an enum key.
+  ///
+  /// This function takes a map of enum values to their corresponding data values
+  /// and returns a function that can be used to find the enum key for a given data value.
+  ///
+  /// The returned function takes an [Object?] data value and returns the corresponding
+  /// enum key of type [T], or `null` if no matching entry is found.
+  ///
+  /// - Parameter enumMap: A map of enum values to their corresponding data values.
+  /// - Returns: A function that takes an [Object?] data value and returns the corresponding
+  ///   enum key of type [T], or `null` if no matching entry is found.
+  @protected
+  T? Function(Object? data) $fromValueWithEnumMap<T>(
+    Map<T, Object?> enumMap,
+  ) {
+    return (Object? data) {
+      return enumMap.entries
+          .firstWhereOrNull((entry) => entry.value == data)
+          ?.key;
+    };
+  }
+
   final Map<String, Object?>? _data;
 
-  /// A protected method that retrieves a value from the model's data based on the provided field.
-  /// It supports various data types and provides custom conversion functions for lists and maps.
+  /// Retrieves a value of type `T` from the internal data map using the provided key.
   ///
-  /// Parameters:
-  /// - key: A required string representing the field name to retrieve from the model's data.
-  /// - fromJson: An optional function that converts a single JSON object to a custom data type.
-  /// - fromList: An optional function that converts a list of JSON objects to a list of custom data types.
+  /// The method attempts to cast the value directly to `T`. If that fails, it tries to
+  /// convert the value using the provided conversion functions (`fromJson`, `fromList`, `fromValue`).
   ///
-  /// Return:
-  /// - Returns the value of the specified field, converted using the provided `fromJson` or `fromList` function,
-  ///   or attempts to convert the value to the specified type if no conversion function is provided.
-  ///   If the value is not found or cannot be converted, returns `null`.
+  /// If no conversion functions are provided, it attempts to parse the value to common types
+  /// such as `int`, `double`, `num`, `bool`, and `String`.
+  ///
+  /// - Parameters:
+  ///   - key: The key to look up in the internal data map.
+  ///   - fromJson: A function that converts a `Map<String, Object?>` to `T`.
+  ///   - fromList: A function that converts a `List<Map<String, Object?>?>` to `T`.
+  ///   - fromValue: A function that converts an `Object?` to `T`.
+  ///
+  /// - Returns: The value associated with the key, converted to type `T`, or `null` if the conversion fails.
   @protected
   T? $get<T>(
     String key, {
     T? Function(Map<String, Object?>)? fromJson,
     T? Function(List<Map<String, Object?>?>?)? fromList,
+    T? Function(Object? value)? fromValue,
   }) {
     final value = _data?[key];
 
     if (value is T?) {
       return value;
+    }
+
+    if (fromValue != null) {
+      return fromValue(value);
     }
 
     if (fromList != null) {
@@ -154,6 +194,33 @@ base class SimpleModel {
   @override
   int get hashCode => _data.hashCode;
 
+  /// Returns a string representation of the object.
+  ///
+  /// This method overrides the default `toString` method to provide a custom
+  /// string representation of the object based on its `_data` property.
+  ///
+  /// Returns:
+  ///   A string representation of the `_data` property.
   @override
   String toString() => _data.toString();
+}
+
+/// An extension on `List<SimpleModel?>` that provides a method to convert
+/// the list of `SimpleModel` objects to a list of JSON maps.
+///
+/// The `toJson` method maps each `SimpleModel` object in the list to its
+/// JSON representation using the `toJson` method of `SimpleModel`. If an
+/// element in the list is `null`, it will be mapped to `null` in the resulting
+/// list of JSON maps.
+///
+/// Returns a list of JSON maps representing the `SimpleModel` objects.
+extension ListSimpleModelExtension on List<SimpleModel?> {
+  /// Converts the list of objects to a list of JSON-serializable maps.
+  ///
+  /// Each object in the list is converted to a JSON map using its `toJson` method.
+  /// If an object is `null`, it will be represented as `null` in the resulting list.
+  ///
+  /// Returns a list of maps where each map represents the JSON-serializable
+  /// version of the corresponding object in the original list.
+  List<Map<String, Object?>?> toJson() => map((e) => e?.toJson()).toList();
 }

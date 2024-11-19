@@ -1,6 +1,12 @@
 # Simple Model
 
-Simple way for converting to and from JSON without code generator.
+A straightforward method for converting between JSON and its reverse format without the need for a code generator.
+
+## Simple Model Converter
+
+Utilize this converter to convert JSON data into Simple Model classes.
+
+[Try Converter](https://simple-model-converter.web.app/)
 
 ## Features
 
@@ -11,9 +17,11 @@ Simple way for converting to and from JSON without code generator.
 ## Getting started
 
 - `SimpleModel` for converting to and from JSON
+- `SimpleModel.fromJsonList` method for converting JSON list of objects
+- `SimpleModel.getEnumMap` method for getting enum map
 - `$get` method for getting data by key
 - `$fromList` method for handling list of objects
-- `SimpleModel.fromJsonList` method for converting JSON list of objects
+- `$fromValueWithEnumMap` method for handling enum
 
 ## Usage
 
@@ -80,6 +88,7 @@ If you want to convert JSON data like this
 ```json
 {
   ...
+  "status": 0,
   "company": {
     "name": "Company Name",
     "location": "Mountain View"
@@ -96,6 +105,11 @@ The following example shows how to convert
 ```dart
 final class ExampleModel extends SimpleModel {
   ...
+
+  Status? get status => $get(
+      'status',
+      fromValue: $fromValueWithEnumMap(Status.enumMap),
+    );
 
   ExampleCompanyModel? get company => $get(
         'company',
@@ -122,6 +136,21 @@ final class ExampleFriendModel extends SimpleModel {
   String? get name => $get('name');
 
   int? get age => $get('age');
+}
+
+enum Status {
+  running,
+  stopped,
+  paused,
+  ;
+
+  static final enumMap = SimpleModel.getEnumMap(values)(
+    (value) => switch (value) {
+      Status.running => 1,
+      Status.stopped => 2,
+      Status.paused => 3,
+    },
+  );
 }
 ```
 
