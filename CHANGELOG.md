@@ -1,3 +1,7 @@
+## 1.0.9
+
+Improve performance
+
 ## 1.0.8
 
 Update Dart sdk to ">=3.0.0 <4.0.0"

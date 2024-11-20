@@ -119,6 +119,15 @@ base class SimpleModel {
 
   final Map<String, Object?>? _data;
 
+  /// A map to cache the converted values.
+  final Map<String, Object?> _cacheMap = {};
+
+  /// Sets the cache for the provided key and returns the result.
+  T? _setCacheAndReturn<T>(String key, T? result) {
+    _cacheMap[key] = result;
+    return result;
+  }
+
   /// Retrieves a value of type `T` from the internal data map using the provided key.
   ///
   /// The method attempts to cast the value directly to `T`. If that fails, it tries to
@@ -141,6 +150,10 @@ base class SimpleModel {
     T? Function(List<Map<String, Object?>?>?)? fromList,
     T? Function(Object? value)? fromValue,
   }) {
+    if (_cacheMap.containsKey(key)) {
+      return _cacheMap[key] as T?;
+    }
+
     final value = _data?[key];
 
     if (value is T?) {
@@ -148,42 +161,42 @@ base class SimpleModel {
     }
 
     if (fromValue != null) {
-      return fromValue(value);
+      return _setCacheAndReturn(key, fromValue(value));
     }
 
     if (fromList != null) {
       if (value is List<Map<String, Object?>?>) {
-        return fromList(value);
+        return _setCacheAndReturn(key, fromList(value));
       }
     }
 
     if (fromJson != null) {
       if (value is Map<String, Object?>) {
-        return fromJson(value);
+        return _setCacheAndReturn(key, fromJson(value));
       }
     }
 
     if (T == int) {
-      return int.tryParse(value.toString()) as T?;
+      return _setCacheAndReturn(key, int.tryParse(value.toString()) as T?);
     }
 
     if (T == double) {
-      return double.tryParse(value.toString()) as T?;
+      return _setCacheAndReturn(key, double.tryParse(value.toString()) as T?);
     }
 
     if (T == num) {
-      return num.tryParse(value.toString()) as T?;
+      return _setCacheAndReturn(key, num.tryParse(value.toString()) as T?);
     }
 
     if (T == bool) {
-      return bool.tryParse(value.toString()) as T?;
+      return _setCacheAndReturn(key, bool.tryParse(value.toString()) as T?);
     }
 
     if (T == String) {
-      return value.toString() as T?;
+      return _setCacheAndReturn(key, value.toString() as T?);
     }
 
-    return null;
+    return _setCacheAndReturn(key, null);
   }
 
   /// Converts the model's data to a JSON-compatible map.
