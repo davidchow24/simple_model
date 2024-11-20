@@ -1,10 +1,10 @@
 name: simple_model
 description: "Simple way for converting to and from JSON without code generator."
-version: 1.0.7
+version: 1.0.8
 homepage: https://github.com/davidchow24/simple_model
 
 environment:
-  sdk: ^3.5.4
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   collection: ^1.18.0

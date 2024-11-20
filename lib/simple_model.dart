@@ -196,7 +196,7 @@ base class SimpleModel {
   ///
   /// Return:
   /// - A map representing the model's data in JSON format, or null if the model's data is null.
-  Map<String, Object?>? toJson() => _data != null ? Map.from(_data) : null;
+  Map<String, Object?>? toJson() => _data != null ? Map.from(_data!) : null;
 
   @override
   bool operator ==(Object other) {
