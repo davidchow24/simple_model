@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 /// A base class for the SimpleModel.
@@ -111,9 +110,12 @@ base class SimpleModel {
     Map<T, Object?> enumMap,
   ) {
     return (Object? data) {
-      return enumMap.entries
-          .firstWhereOrNull((entry) => entry.value == data)
-          ?.key;
+      for (final entry in enumMap.entries) {
+        if (entry.value == data) {
+          return entry.key;
+        }
+      }
+      return null;
     };
   }
 
@@ -209,14 +211,19 @@ base class SimpleModel {
   ///
   /// Return:
   /// - A map representing the model's data in JSON format, or null if the model's data is null.
-  Map<String, Object?>? toJson() => _data != null ? Map.from(_data!) : null;
+  Map<String, Object?>? toJson() => _data;
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) return true;
+    if (identical(this, other)) {
+      return true;
+    }
 
-    return other is SimpleModel &&
-        const DeepCollectionEquality().equals(other._data, _data);
+    if (other is SimpleModel) {
+      return _deepEqual(_data, other._data);
+    }
+
+    return false;
   }
 
   @override
@@ -251,4 +258,61 @@ extension ListSimpleModelExtension on List<SimpleModel?> {
   /// Returns a list of maps where each map represents the JSON-serializable
   /// version of the corresponding object in the original list.
   List<Map<String, Object?>?> toJson() => map((e) => e?.toJson()).toList();
+}
+
+bool _deepEqual(Object? a, Object? b) {
+  if (a is Map && b is Map) {
+    if (a.length != b.length) {
+      return false;
+    }
+
+    for (final key in a.keys) {
+      if (!b.containsKey(key)) {
+        return false;
+      }
+
+      final value1 = a[key];
+      final value2 = b[key];
+
+      if (value1 == null && value2 == null) {
+        continue;
+      }
+      if (value1 == null || value2 == null) {
+        return false;
+      }
+
+      if (value1 is Map && value2 is Map) {
+        if (!_deepEqual(
+          value1 as Map<String, Object?>,
+          value2 as Map<String, Object?>,
+        )) {
+          return false;
+        }
+      } else if (value1 is List && value2 is List) {
+        if (value1.length != value2.length) {
+          return false;
+        }
+        for (int i = 0; i < value1.length; i++) {
+          if (!_deepEqual(value1[i], value2[i])) {
+            return false;
+          }
+        }
+      } else if (!_deepEqual(value1, value2)) {
+        return false;
+      }
+    }
+
+    return true;
+  } else if (a is List && b is List) {
+    if (a.length != b.length) {
+      return false;
+    }
+    for (int i = 0; i < a.length; i++) {
+      if (!_deepEqual(a[i], b[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+  return a == b;
 }

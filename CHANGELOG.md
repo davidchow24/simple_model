@@ -1,3 +1,7 @@
+## 1.0.10
+
+Improve performance
+
 ## 1.0.9
 
 Improve performance

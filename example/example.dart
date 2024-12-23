@@ -46,6 +46,10 @@ void main() {
   );
 
   print(model2.status); // Status.stopped
+
+  final model3 = ExampleModel.fromJson(model.toJson());
+
+  print(model3 == model); // true
 }
 
 final class ExampleModel extends SimpleModel {

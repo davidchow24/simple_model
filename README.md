@@ -88,7 +88,7 @@ If you want to convert JSON data like this
 ```json
 {
   ...
-  "status": 0,
+  "status": 1,
   "company": {
     "name": "Company Name",
     "location": "Mountain View"
