@@ -1,11 +1,8 @@
-import 'package:meta/meta.dart';
-
 /// A base class for the SimpleModel.
 ///
 /// This class serves as a foundation for creating simple models.
 /// Extend this class to implement specific model functionalities.
 base class SimpleModel {
-  @protected
   SimpleModel(Map<String, Object?>? data)
       : _data = data != null ? Map.unmodifiable(data) : null;
 
@@ -56,7 +53,6 @@ base class SimpleModel {
   ///     will be included in the merged map.
   ///
   /// - Returns: A new object of type `T` created from the merged map.
-  @protected
   T $copyWith<T>(
     Map<String, Object?>? data, {
     required T Function(Map<String, Object?>) fromJson,
@@ -79,7 +75,6 @@ base class SimpleModel {
   ///
   /// - [data]: The list of objects to be converted.
   /// - [fromJsonT]: A function that converts a map to an instance of [T].
-  @protected
   List<T?>? Function(List<Object?>? data) $fromList<T>(
     T? Function(Map<String, Object?>?)? fromJsonT,
   ) {
@@ -105,7 +100,6 @@ base class SimpleModel {
   /// - Parameter enumMap: A map of enum values to their corresponding data values.
   /// - Returns: A function that takes an [Object?] data value and returns the corresponding
   ///   enum key of type [T], or `null` if no matching entry is found.
-  @protected
   T? Function(Object? data) $fromValueWithEnumMap<T>(
     Map<T, Object?> enumMap,
   ) {
@@ -145,7 +139,6 @@ base class SimpleModel {
   ///   - fromValue: A function that converts an `Object?` to `T`.
   ///
   /// - Returns: The value associated with the key, converted to type `T`, or `null` if the conversion fails.
-  @protected
   T? $get<T>(
     String key, {
     T? Function(Map<String, Object?>)? fromJson,
@@ -265,50 +258,52 @@ bool _deepEqual(Object? a, Object? b) {
     if (a.length != b.length) {
       return false;
     }
-
     for (final key in a.keys) {
       if (!b.containsKey(key)) {
         return false;
       }
-
       final value1 = a[key];
       final value2 = b[key];
-
       if (value1 == null && value2 == null) {
         continue;
       }
       if (value1 == null || value2 == null) {
         return false;
       }
-
-      if (value1 is Map && value2 is Map) {
-        if (!_deepEqual(
-          value1 as Map<String, Object?>,
-          value2 as Map<String, Object?>,
-        )) {
-          return false;
-        }
-      } else if (value1 is List && value2 is List) {
-        if (value1.length != value2.length) {
-          return false;
-        }
-        for (int i = 0; i < value1.length; i++) {
-          if (!_deepEqual(value1[i], value2[i])) {
-            return false;
-          }
-        }
-      } else if (!_deepEqual(value1, value2)) {
+      if (!_deepEqual(value1, value2)) {
         return false;
       }
     }
-
     return true;
-  } else if (a is List && b is List) {
+  }
+  if (a is List && b is List) {
     if (a.length != b.length) {
       return false;
     }
     for (int i = 0; i < a.length; i++) {
       if (!_deepEqual(a[i], b[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+  if (a is Set && b is Set) {
+    if (a.length != b.length) {
+      return false;
+    }
+    for (final value1 in a) {
+      if (!b.contains(value1)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  if (a is Iterable && b is Iterable) {
+    if (a.length != b.length) {
+      return false;
+    }
+    for (int i = 0; i < a.length; i++) {
+      if (!_deepEqual(a.elementAt(i), b.elementAt(i))) {
         return false;
       }
     }
