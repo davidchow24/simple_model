@@ -17,7 +17,6 @@ Utilize this converter to convert JSON data into Simple Model classes.
 ## Getting started
 
 - `SimpleModel` for converting to and from JSON
-- `SimpleModel.fromJsonList` method for converting JSON list of objects
 - `SimpleModel.getEnumMap` method for getting enum map
 - `$get` method for getting data by key
 - `$fromList` method for handling list of objects
@@ -178,7 +177,7 @@ If you want to convert the JSON like this
 The following example shows how to convert
 
 ```dart
-final model = SimpleModel.fromJsonList(ExampleModel.fromJson)([
+final model = [
   {
     "name": "John Doe",
     "age": 30,
@@ -193,7 +192,7 @@ final model = SimpleModel.fromJsonList(ExampleModel.fromJson)([
     "scores": [100, 90, 80, 70],
     "isEmployed": false
   }
-]);
+].map(ExampleModel.fromJson).toList();
 
 model.length; // 2
 ```

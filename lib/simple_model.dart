@@ -6,21 +6,6 @@ base class SimpleModel {
   SimpleModel(Map<String, Object?>? data)
       : _data = data != null ? Map.unmodifiable(data) : null;
 
-  /// Converts a list of JSON objects to a list of objects.
-  static List<T?>? Function(List<Object?>? json) fromJsonList<T>(
-    T? Function(Map<String, Object?>?)? fromJsonT,
-  ) {
-    return (List<Object?>? data) {
-      if (data is List<T?>?) {
-        return data;
-      }
-      if (fromJsonT != null) {
-        return data.whereType<Map<String, Object?>?>().map(fromJsonT).toList();
-      }
-      return null;
-    };
-  }
-
   /// Generates a map from enum values to mapped values using the provided mapper function.
   ///
   /// This function takes a list of enum values and a mapper function, and returns a map

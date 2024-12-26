@@ -50,6 +50,25 @@ void main() {
   final model3 = ExampleModel.fromJson(model.toJson());
 
   print(model3 == model); // true
+
+  final model4 = [
+    {
+      "name": "John Doe",
+      "age": 30,
+      "height": 1.8,
+      "scores": [100, 90, 80],
+      "isEmployed": true
+    },
+    {
+      "name": "Kevin Doe",
+      "age": 35,
+      "height": 2.8,
+      "scores": [100, 90, 80, 70],
+      "isEmployed": false
+    }
+  ].map(ExampleModel.fromJson).toList();
+
+  print(model4.length); // 2
 }
 
 final class ExampleModel extends SimpleModel {
